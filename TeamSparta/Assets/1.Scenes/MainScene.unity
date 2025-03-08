@@ -140,12 +140,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1001 &111555186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -209,6 +209,10 @@ PrefabInstance:
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_Constraints
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -449,12 +453,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1 &478636166
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,11 +604,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_BodyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_Constraints
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_GravityScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -800,12 +812,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1 &679450417
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,6 +961,62 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 360675798204360400, guid: 5adc49a3cd414458b96cda173bbaeffb, type: 3}
   m_PrefabInstance: {fileID: 706440588}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &913495804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 913495806}
+  - component: {fileID: 913495805}
+  m_Layer: 0
+  m_Name: ZombieManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &913495805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913495804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d89f128edbb68294698a442e34b34277, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zombiePrefab: {fileID: 0}
+  spawnPoint: {fileID: 0}
+  zombies:
+  - {fileID: 1201671086}
+  - {fileID: 2140562174}
+  - {fileID: 978240001}
+  - {fileID: 1432571596}
+  - {fileID: 1157251785}
+  - {fileID: 98584880}
+  - {fileID: 450688934}
+  - {fileID: 923535688}
+  - {fileID: 655693057}
+--- !u!4 &913495806
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913495804}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.0274491, y: -1.3279412, z: -0.031650163}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &923535685 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 319310827380095937, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
@@ -967,12 +1035,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1 &978240000 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 319310827380095937, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
@@ -991,12 +1059,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1001 &985220764
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1063,6 +1131,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_GravityScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1301,6 +1373,10 @@ PrefabInstance:
       propertyPath: m_GravityScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1327,12 +1403,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1001 &1201671084
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1394,11 +1470,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_BodyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_Constraints
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_GravityScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1427,12 +1511,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1001 &1249973605
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1496,6 +1580,10 @@ PrefabInstance:
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_Constraints
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1601,7 +1689,7 @@ GameObject:
   - component: {fileID: 1272031741}
   - component: {fileID: 1272031740}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: MoveEvent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1697,12 +1785,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!1001 &1465185910
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1766,6 +1854,10 @@ PrefabInstance:
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_Constraints
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1887,6 +1979,10 @@ PrefabInstance:
       value: ZombieMelee (7)
       objectReference: {fileID: 0}
     - target: {fileID: 319310827380095937, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 319310827380095937, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_TagString
       value: Zombie
       objectReference: {fileID: 0}
@@ -1944,7 +2040,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_CollisionDetection
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2143,7 +2239,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2067488147850009325, guid: e48e7c461a85c463cba5a999afb91a67, type: 3}
       propertyPath: m_CollisionDetection
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2246,12 +2342,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  climbHeight: 0.1
-  climbSpeed: 8
   speed: 1
   hasZombieAbove: 0
   ZombieBehind: 0
   isEvent: 0
+  isFirstZombieHitWall: 0
+  isGround: 0
 --- !u!212 &437466680617788831
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2834,13 +2930,14 @@ SceneRoots:
   - {fileID: 1489341059}
   - {fileID: 1524754161756929040}
   - {fileID: 1201671084}
-  - {fileID: 1148512030}
   - {fileID: 1974998543}
-  - {fileID: 1621928556}
   - {fileID: 491091552}
-  - {fileID: 985220764}
   - {fileID: 1249973605}
-  - {fileID: 1465185910}
   - {fileID: 111555186}
+  - {fileID: 1148512030}
+  - {fileID: 1621928556}
+  - {fileID: 985220764}
+  - {fileID: 1465185910}
   - {fileID: 1044568128}
   - {fileID: 1272031742}
+  - {fileID: 913495806}
