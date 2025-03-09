@@ -15,8 +15,8 @@ TagManager:
   - Water
   - UI
   - 1Line
-  - 
-  - 
+  - 2Line
+  - 3Line
   - 
   - 
   - 
@@ -43,4 +43,22 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Leg_R
+    uniqueID: 1737466917
+    locked: 0
+  - name: Leg_L
+    uniqueID: 365832039
+    locked: 0
+  - name: Body
+    uniqueID: 2448626873
+    locked: 0
+  - name: Arm_L
+    uniqueID: 3954806175
+    locked: 0
+  - name: Arm_R
+    uniqueID: 3150581823
+    locked: 0
+  - name: Head
+    uniqueID: 3228634845
     locked: 0

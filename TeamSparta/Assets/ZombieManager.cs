@@ -4,33 +4,48 @@ using UnityEngine;
 public enum State
 {
     Move,
-    Idle
+    Idle,
+    Die
 }
 public class ZombieManager : Singleton<ZombieManager>
 {
 
     public GameObject zombiePrefab; // 좀비 프리팹
-    public Transform spawnPoint;    // 좀비 스폰 위치
     public List<ZombieController> zombies = new List<ZombieController>(); // 좀비 리스트
 
-    public ZombieController SpawnZombie(Vector2 position)    // 좀비 생성
+    public void SpawnZombie(Vector2 position)    // 좀비 생성
     {
-        GameObject newZombie = Instantiate(zombiePrefab, position, Quaternion.identity);
-        ZombieController zombieController = newZombie.GetComponent<ZombieController>();
-
-        if (zombieController != null)
+        for(int i = 0; i < 30; i++)
         {
-            zombies.Add(zombieController);
+            GameObject newZombie = Instantiate(zombiePrefab, position, Quaternion.identity);
+            ZombieController zombieController = newZombie.GetComponent<ZombieController>();
+            zombieController.zombieData = new ZombieData(10, 10, 1);//hp ,max hp ,speed
+            newZombie.SetActive(false);
+            if (zombieController != null)
+            {
+                zombies.Add(zombieController);
+            }
         }
-
-        return zombieController;
+    }
+    public GameObject GetZombieInfoByIndex(int index)
+    {
+        if (index >= 0 && index < zombies.Count)
+        {
+            ZombieController zombie = zombies[index];
+            if (zombie != null)
+            {
+                return zombie.gameObject;
+            }
+        }
+        return null;
+      
     }
 
-    public void PauseAllZombies(bool isPaused)    // 전체 좀비 행동 일시 정지
+    public void PauseAllZombies(ZombieController zombieController, bool isPaused)    // 전체 좀비 행동 일시 정지
     {
         foreach (ZombieController zombie in zombies)
         {
-            if (!zombie.isGround || !zombie.isFirstZombieHitWall) continue;
+            if (!zombie.isGround || !zombie.isFirstZombieHitWall || zombieController.gameObject.layer != zombie.gameObject.layer) continue;
 
             if (!isPaused)
             {
@@ -56,11 +71,11 @@ public class ZombieManager : Singleton<ZombieManager>
         }
         return null;
     }
-    public IEnumerator PushBackZombies()//뒤로 밀기
+    public IEnumerator PushBackZombies(GameObject gameObject)//뒤로 밀기
     {
         foreach (ZombieController zombie in zombies)
         {
-            if (!zombie.isFirstZombieHitWall || !zombie.isGround || zombie.currentState == State.Move) continue;
+            if (!zombie.isFirstZombieHitWall || !zombie.isGround || zombie.currentState == State.Move || gameObject.layer != zombie.gameObject.layer) continue;
 
             zombie.SetEventStatus(true);
             StartCoroutine(zombie.PushBackCoroutine(0.7f, 0.3f));
@@ -68,11 +83,11 @@ public class ZombieManager : Singleton<ZombieManager>
         }
         yield return null;
     }
-    public IEnumerator PushDownZombies()//아래로 밀기
+    public IEnumerator PushDownZombies(GameObject gameObject)//아래로 밀기
     {
         foreach (ZombieController zombie in zombies)
         {
-            if (zombie.currentState == State.Move || zombie.isGround) continue;
+            if (zombie.currentState == State.Move || zombie.isGround || gameObject.layer != zombie.gameObject.layer) continue;
           
             zombie.SetEventStatus(true);
             StartCoroutine(zombie.PushDownCoroutine(0.7f, 0.1f));

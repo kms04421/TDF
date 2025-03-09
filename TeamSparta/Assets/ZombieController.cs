@@ -8,7 +8,6 @@ public class ZombieController : MonoBehaviour
 
     private float climbHeight = 0.1f;  // 올라갈 높이
     private float climbSpeed = 5f;   // 올라가는 속도
-    public float speed = 1f;
     Rigidbody2D rb;
     BoxCollider2D boxCollider2D;
     public bool hasZombieAbove = false;
@@ -18,6 +17,9 @@ public class ZombieController : MonoBehaviour
     public bool isGround = false;
     private float collisionTime = 0;
     private ZombieManager zombieManager;
+    private GameObject forwardObject;
+    public ZombieData zombieData;
+    private SpriteRenderer spriteRenderer;
     void Start()
     {
         zombieManager = ZombieManager.Instance;
@@ -29,21 +31,32 @@ public class ZombieController : MonoBehaviour
         switch (currentState)
         {
             case State.Move:
-                transform.Translate(Vector2.left * speed * Time.deltaTime);
+                transform.Translate(Vector2.left * zombieData.speed * Time.deltaTime);
                 break;
             case State.Idle:
-                if(!isFirstZombieHitWall && !isEvent)
+                if (isFirstZombieHitWall&& hasZombieAbove && isGround || !isFirstZombieHitWall && !hasZombieAbove&& isGround ||
+                    hasZombieAbove && !isFirstZombieHitWall && isGround )
                 {
-                    ChangeState(State.Move);
+                    GameObject chackobj = ChackGamobj(-0.2f, 0.7f, 0.3f);
+                    if (chackobj == null)
+                    {
+                        ChangeState(State.Move);
+                        isFirstZombieHitWall = false;
+                        isEvent = false;
+
+                    }                   
                 }
+              
                 break;
         }
+      
     }
-
+   
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (!collision.transform.CompareTag("Zombie")) return;
 
+        if (!collision.transform.CompareTag("Zombie")) return;
+       
         ZombieController zombieController = zombieManager.FindZombieByID(collision.gameObject);
         if (zombieController == null) return;
         bool foundZombieAbove = false;
@@ -51,13 +64,17 @@ public class ZombieController : MonoBehaviour
         GameObject go = ChackGamobj(-0.1f, 1.2f, 0.2f);
         if (go != null)    // 위쪽 좀비 체크
         {
-            if (go.CompareTag("Zombie")) foundZombieAbove = true;
+            if (go.CompareTag("Zombie"))
+            {
+                foundZombieAbove = true;
+            }
         }
-        
+    
         foreach (ContactPoint2D contact in collision.contacts)
         {
             Vector2 contactPoint = contact.point;
-
+            
+            if (gameObject.layer != contact.collider.gameObject.layer) continue;
             // 뒤쪽 좀비 체크
             if (contactPoint.x >= transform.position.x)
             {
@@ -68,53 +85,73 @@ public class ZombieController : MonoBehaviour
             {
                 foundZombieAbove = true;
             }
-
-        }
-        ZombieBehind = foundZombieBehind; //뒤쪾 좀비 존재여부
-        hasZombieAbove = foundZombieAbove;  // 상단 혹은 이벤트 결과 반영
-
-        if (collision.transform.position.x < transform.position.x &&
-            collision.transform.position.y < transform.position.y + 0.5f &&
-            collision.transform.position.y > transform.position.y - 0.5f) // 점프 조건 체크
-        {
-            if (isGround)
+            
+            ZombieBehind = foundZombieBehind; //뒤쪾 좀비 존재여부
+            hasZombieAbove = foundZombieAbove;  // 상단 혹은 이벤트 결과 반영
+            if (gameObject.layer == contact.collider.gameObject.layer &&
+                contactPoint.x < transform.position.x &&
+                contactPoint.y < transform.position.y + 0.5f &&
+                contactPoint.y > transform.position.y - 0.5f) // 점프 조건 체크
             {
-                if (zombieController.isFirstZombieHitWall)
+               
+                if (isGround)
                 {
-                    isFirstZombieHitWall = true;
-                    ChangeState(State.Idle);
-                }
-
-            }
-            if (!hasZombieAbove) // 조건에해당하는 좀비가 없을 때만 점프(상단에 좀비,이벤트 실행중인좀비)
-            {
-                if (!zombieController.hasZombieAbove && !ZombieBehind )
-                {
-                    collisionTime += Time.deltaTime;
-                    if (collisionTime > 0.15f)
+                    if (zombieController.isFirstZombieHitWall)
                     {
-                        collisionTime = 0;
-                        // Debug.Log("대상"+collision.gameObject.name + "나 : " + transform.name);
-                        JumpZonbie(collision, zombieController);
-                    }                   
-                }
+                        isFirstZombieHitWall = true;
+                        ChangeState(State.Idle);
+                    }
 
+                }
+                if (!hasZombieAbove) // 조건에해당하는 좀비가 없을 때만 점프(상단에 좀비,이벤트 실행중인좀비)
+                {
+                    if (!zombieController.hasZombieAbove && !ZombieBehind)
+                    {
+                        if (forwardObject == null)
+                        {
+                            forwardObject = contact.collider.gameObject;
+                        }
+                        else if (forwardObject == contact.collider.gameObject)
+                        {
+                            collisionTime += Time.deltaTime;
+                            if (collisionTime > 0.15f)
+                            {
+                                collisionTime = 0;
+                                forwardObject = null;
+                                // Debug.Log("대상"+collision.gameObject.name + "나 : " + transform.name);
+                                JumpZonbie(collision, zombieController);
+                            }
+                        }
+                        else
+                        {
+                            forwardObject = contact.collider.gameObject;
+                            collisionTime = 0;
+                        }
+
+                    }
+
+                }
             }
         }
+
 
     }
     public GameObject ChackGamobj(float x, float y, float checkRadius)//설정위치 오브젝트 반환
     {
         Vector2 checkPosition = (Vector2)transform.position + new Vector2(x, y);//확인 방향
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(checkPosition, checkRadius);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(checkPosition, checkRadius, 1 << gameObject.layer);
         if (hits != null)
         {
             foreach (Collider2D hit in hits)
             {
                 if (hit.CompareTag("Zombie"))
                 {
-                    return hit.gameObject;
+                    if(hit.gameObject != gameObject)
+                    {
+                        return hit.gameObject;
+                    }
+                    
                 }
             }
 
@@ -129,8 +166,8 @@ public class ZombieController : MonoBehaviour
     {
         Vector3 startPosition = transform.position;
         Vector3 targetPosition = startPosition + Vector3.right * distance; // 오른쪽으로 밀기
-        // isEvent = true;
-        
+                                                                           // isEvent = true;
+
         float elapsed = 0f;
         while (elapsed < duration)//타겟오브젝트 뒤로 밀어냄
         {
@@ -166,16 +203,16 @@ public class ZombieController : MonoBehaviour
 
         float boxY = collision.collider.bounds.max.y;  // 콜라이더 박스의 가장 위쪽 좌표
         float boxX = collision.collider.bounds.max.x + 0.1f;  // 콜라이더 박스의 가장 앞쪽 좌표
-        Vector2 targetPosition = new Vector2(boxX, boxY + climbHeight);
+        Vector3 targetPosition = new Vector3(boxX, boxY + climbHeight, transform.position.z);
         StartCoroutine(Climb(targetPosition, zombieController)); // 좀비 위로올라가기
 
     }
-    IEnumerator Climb(Vector2 targetPosition, ZombieController zombieController)
+    IEnumerator Climb(Vector3 targetPosition, ZombieController zombieController)
     {
         rb.gravityScale = 0;
         while (transform.position.y < targetPosition.y)
         {
-            transform.position = Vector2.MoveTowards(transform.position, targetPosition, climbSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, climbSpeed * Time.deltaTime);
             yield return null;
         }
         rb.gravityScale = 1;  // 중력 다시 활성화
@@ -199,95 +236,68 @@ public class ZombieController : MonoBehaviour
 
 
                 break;
+            case State.Die:
+                gameObject.SetActive(false);
+
+                break;
         }
         currentState = state;
     }
 
     public void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.transform.CompareTag("Ground"))
+        if (gameObject.layer == collision.collider.gameObject.layer)
         {
-            isGround = false;
-        }
-        if (collision.transform.CompareTag("Zombie") && isGround)
-        {
-            ZombieController zombieController = zombieManager.FindZombieByID(gameObject);
-            if (zombieController.isFirstZombieHitWall && 
-                collision.transform.position.x < transform.position.x &&
-                collision.transform.position.y < transform.position.y + 0.5f &&
-                collision.transform.position.y > transform.position.y - 0.5f)
+            if (collision.transform.CompareTag("Ground"))
             {
-                isFirstZombieHitWall = false;
+                isGround = false;
             }
-            else
+            if (collision.transform.CompareTag("Zombie") && isGround)
             {
-                ChangeState(State.Move);
-            }
-            
+                ZombieController zombieController = zombieManager.FindZombieByID(gameObject);
+                if (zombieController.isFirstZombieHitWall &&
+                    collision.transform.position.x < transform.position.x &&
+                    collision.transform.position.y < transform.position.y + 0.5f &&
+                    collision.transform.position.y > transform.position.y - 0.5f)
+                {
+                    isFirstZombieHitWall = false;
+                }
+                else
+                {
+                    ChangeState(State.Move);
+                }
 
+
+            }
         }
+
     }
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.transform.CompareTag("Ground"))
+        if (gameObject.layer == collision.collider.gameObject.layer)
         {
-            isGround = true;
+            if (collision.transform.CompareTag("Ground"))
+            {
+                isGround = true;
+            }
+
         }
         if (collision.transform.CompareTag("Hero"))
         {
-            /*if (isGround)
-            {
-                isFirstZombieHitWall = true;
-            }*/
             isFirstZombieHitWall = true;
             ChangeState(State.Idle);
         }
-       
     }
- 
-
-    /*  void OnDrawGizmos()
-     {
-         Vector2 checkPosition = (Vector2)transform.position + new Vector2(0.5f, 0);
-         float checkRadius =0.5f;
-
-         Gizmos.color = Color.red;
-         Gizmos.DrawWireSphere(checkPosition, checkRadius);
-     }*/
-
-    /*   private IEnumerator PushBackCoroutine(float distance, float duration, GameObject go) // 오른쪽으로 미는함수
-       {
-           Vector3 startPosition = go.transform.position;
-           Vector3 targetPosition = startPosition + Vector3.right * distance; // 오른쪽으로 밀기
-           ZombieController zombieController = zombieManager.FindZombieByID(go);
-           isEvent = true;
-           zombieController.isEvent = true;
-           float elapsed = 0f;
-           while (elapsed < duration)//타겟오브젝트 뒤로 밀어냄
-           {
-               go.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsed / duration);
-               elapsed += Time.deltaTime;
-               yield return null;
-           }
-           go.transform.position = targetPosition;
 
 
-       }
-       public IEnumerator PushDownCoroutine(float distance, float duration, GameObject go) // 아래로 미는 함수
-       {
-           Vector3 startPosition = transform.position;
-           Vector3 targetPosition = transform.position + Vector3.down * distance; // 아래로 밀기
-           ZombieController zombieController = zombieManager.FindZombieByID(go);
-           float elapsed = 0f;
-           while (elapsed < duration)//자신을 아래으로
-           {
-               transform.position = Vector3.Lerp(startPosition, targetPosition, elapsed / duration);
-               elapsed += Time.deltaTime;
-               yield return null;
-           }
-           transform.position = targetPosition;
-           isFirstZombieHitWall = true;
-           isEvent = false;
-           zombieController.isEvent = false;
-       }*/
+/*    void OnDrawGizmos()
+    {
+
+        Vector2 checkPosition = (Vector2)transform.position + new Vector2(-0.2f, 0.7f);
+        float checkRadius = 0.3f;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(checkPosition, checkRadius);
+    }*/
+
 }

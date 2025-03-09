@@ -16,7 +16,7 @@ public class PushZombie : MonoBehaviour
             ZombieController zombieController = zombieManager.FindZombieByID(collision.gameObject);
             zombieController.isEvent = true;
             StartCoroutine(DelayedCoroutine (zombieController));
-            zombieManager.PauseAllZombies(true);
+            zombieManager.PauseAllZombies(zombieController,true);
         }
         
     }
@@ -24,10 +24,10 @@ public class PushZombie : MonoBehaviour
     {
         
         yield return new WaitForSeconds(0.3f);
-        yield return StartCoroutine(zombieManager.PushBackZombies());
+        yield return StartCoroutine(zombieManager.PushBackZombies(zombieController.gameObject));
 
         yield return new WaitForSeconds(0.3f);
-        yield return StartCoroutine(zombieManager.PushDownZombies());
+        yield return StartCoroutine(zombieManager.PushDownZombies(zombieController.gameObject));
         zombieController.isEvent = false;
         //zombieController.UnderZombiePush();
     }
